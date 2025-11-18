@@ -1,0 +1,135 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+env:
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
+jobs:
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: team_tasks
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        working-directory: ./back-end
+        run: |
+          docker build \
+            --target development \
+            --tag team-tasks-backend:test \
+            --cache-from type=gha \
+            --cache-to type=gha,mode=max \
+            .
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          # Wait for PostgreSQL service container to be healthy
+          sleep 5
+          echo "PostgreSQL should be ready!"
+
+      - name: Run database migrations
+        working-directory: ./back-end
+        run: |
+          docker run --rm \
+            --network host \
+            -e POSTGRES_HOST=localhost \
+            -e POSTGRES_PORT=5432 \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=team_tasks \
+            team-tasks-backend:test \
+            alembic upgrade head
+
+      - name: Run pytest tests
+        working-directory: ./back-end
+        run: |
+          docker run --rm \
+            --network host \
+            -e POSTGRES_HOST=localhost \
+            -e POSTGRES_PORT=5432 \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=team_tasks \
+            -e JWT_SECRET=test-secret-key \
+            -e JWT_ALGORITHM=HS256 \
+            -e JWT_EXPIRATION_HOURS=24 \
+            -e DEBUG=true \
+            -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY || '' }} \
+            team-tasks-backend:test \
+            pytest -v --tb=short --disable-warnings
+
+      - name: Upload test results (optional)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            back-end/.pytest_cache
+            back-end/test-results.xml
+          if-no-files-found: ignore
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub (optional)
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        continue-on-error: true
+
+      - name: Build production Docker image
+        working-directory: ./back-end
+        run: |
+          docker build \
+            --target production \
+            --tag team-tasks-backend:latest \
+            --tag team-tasks-backend:${{ github.sha }} \
+            --cache-from type=gha \
+            --cache-to type=gha,mode=max \
+            .
+
+      - name: Push Docker image (optional)
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          echo "Docker image built successfully"
+          # Uncomment to push to registry:
+          # docker push team-tasks-backend:latest
+          # docker push team-tasks-backend:${{ github.sha }}
+

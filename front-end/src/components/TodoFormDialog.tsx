@@ -53,13 +53,21 @@ export const TodoFormDialog = ({
 
   useEffect(() => {
     if (initialTodo) {
+      // Handle both camelCase (dueDate) and snake_case (due_date) from API
+      const dueDateValue = (initialTodo as any).due_date || initialTodo.dueDate;
+      // Handle both camelCase (assignee) and snake_case (assignee_id) from API
+      const assigneeIdValue = 
+        initialTodo.assignee?.id || 
+        (initialTodo as any).assignee_id || 
+        '';
+      
       setForm({
         title: initialTodo.title,
         description: initialTodo.description ?? '',
-        dueDate: initialTodo.dueDate
-          ? initialTodo.dueDate.substring(0, 10)
+        dueDate: dueDateValue
+          ? dueDateValue.substring(0, 10)
           : '',
-        assigneeId: initialTodo.assignee?.id ?? '',
+        assigneeId: assigneeIdValue,
         status: initialTodo.status,
       });
     } else {
@@ -132,11 +140,15 @@ export const TodoFormDialog = ({
             onChange={handleChange}
           >
             <MenuItem value="">Unassigned</MenuItem>
-            {members.map((member) => (
-              <MenuItem key={member.id} value={member.user.id}>
-                {member.user.name}
-              </MenuItem>
-            ))}
+            {members.map((member) => {
+              const userId = (member as any).user_id;
+              const userName = (member as any).user_name;
+              return (
+                <MenuItem key={member.id} value={userId}>
+                  {userName}
+                </MenuItem>
+              );
+            })}
           </TextField>
         </Stack>
       </DialogContent>

@@ -1,126 +1,240 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Team Tasks API - FastAPI Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A FastAPI-based backend for team task management with AI assistance, real-time updates, and comprehensive API documentation.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- **FastAPI** with automatic OpenAPI/Swagger documentation
+- **SQLAlchemy** ORM for database models
+- **Pydantic** for request/response validation
+- **JWT Authentication** with secure password hashing
+- **WebSocket** support for real-time updates (Socket.IO)
+- **Alembic** for database migrations
+- **PostgreSQL** database
+- **Google AI Integration** for AI task suggestions
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tech Stack
 
-## Project setup
+- Python 3.11+
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- Alembic
+- PostgreSQL
+- Socket.IO
+- Google AI (optional)
 
+## Setup
+
+### Prerequisites
+
+- Python 3.11 or higher
+- PostgreSQL database
+- (Optional) Google AI API key for AI features
+
+### Installation
+
+1. Install dependencies:
 ```bash
-$ npm install
+pip install -r requirements.txt
 ```
 
-## Compile and run the project
+2. Set up environment variables (create a `.env` file):
+```env
+# Database
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5435
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=team_tasks
 
-```bash
-# development
-$ npm run start
+# JWT
+JWT_SECRET=your-secret-key-here
+JWT_ALGORITHM=HS256
+JWT_EXPIRATION_HOURS=24
 
-# watch mode
-$ npm run start:dev
+# Google AI (optional)
+GOOGLE_API_KEY=your-google-api-key
+GOOGLE_MODEL=gemini-1.5-flash
 
-# production mode
-$ npm run start:prod
+# Server
+PORT=3000
+DEBUG=True
+
+# Frontend
+FRONTEND_URL=http://localhost:5173
 ```
 
-## Run tests (locally)
-
+3. Run database migrations:
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+alembic upgrade head
 ```
 
-## Run tests with Docker
+4. Start the development server:
+```bash
+uvicorn main:socket_app --host 0.0.0.0 --port 3000 --reload
+```
 
-This project is designed to run against a PostgreSQL database (see `typeorm.config.ts`).  
-When running Jest tests inside Docker, make sure the database container is up and the app container has the correct environment variables.
+## API Documentation
 
-### 1. Start the full stack with Docker Compose
+Once the server is running, access the interactive API documentation:
 
-From the repository root:
+- **Swagger UI**: http://localhost:3000/docs
+- **ReDoc**: http://localhost:3000/redoc
+- **OpenAPI JSON**: http://localhost:3000/openapi.json
 
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Login user
+- `GET /api/auth/me` - Get current user info (protected)
+
+### Teams
+- `GET /api/teams` - Get all teams for current user (protected)
+- `POST /api/teams` - Create a new team (protected)
+- `GET /api/teams/{team_id}/members` - Get team members (protected)
+- `POST /api/teams/{team_id}/members` - Add team member (protected)
+- `POST /api/teams/{team_id}/invite` - Invite team member (protected)
+
+### Todos
+- `GET /api/todos?teamId={team_id}` - Get todos for a team (protected)
+- `POST /api/todos` - Create a new todo (protected)
+- `GET /api/todos/{id}` - Get a single todo (protected)
+- `PATCH /api/todos/{id}` - Update a todo (protected)
+- `DELETE /api/todos/{id}` - Delete a todo (protected)
+
+### Notifications
+- `GET /api/notifications` - List notifications for current user (protected)
+
+### AI
+- `POST /api/ai/suggestions` - Get AI task suggestion (protected)
+
+## WebSocket
+
+The API includes WebSocket support via Socket.IO for real-time updates:
+
+- Connect to: `ws://localhost:3000/socket.io/`
+- Namespace: `/collab`
+- Authentication: Include JWT token in `auth.token` or `Authorization` header
+
+Events:
+- `joinTeam` - Join a team room for real-time updates
+- `todo.created` - Broadcasted when a todo is created
+- `todo.updated` - Broadcasted when a todo is updated
+- `todo.deleted` - Broadcasted when a todo is deleted
+- `notification.created` - Broadcasted when a notification is created
+
+## Database Migrations
+
+### Create a new migration:
+```bash
+alembic revision --autogenerate -m "description"
+```
+
+### Apply migrations:
+```bash
+alembic upgrade head
+```
+
+### Rollback migration:
+```bash
+alembic downgrade -1
+```
+
+## Docker & Docker Compose
+
+### Using Docker Compose (Recommended)
+
+1. **Start all services:**
 ```bash
 docker-compose up -d
 ```
 
-This will start the backend (NestJS), frontend, and PostgreSQL containers.
-
-### 2. Run Jest tests **inside** the backend container
-
-Exec into the backend container and run the Jest commands:
-
+2. **Run migrations only:**
 ```bash
-# Replace back-end with the service name from docker-compose.yml if different
-docker compose exec back-end npm run test
-docker compose exec back-end npm run test:e2e
-docker compose exec back-end npm run test:cov
+docker-compose --profile tools run --rm migrate
 ```
 
-The backend container will use the environment variables defined in `docker-compose.yml` (for example `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`) so the tests run against the same PostgreSQL instance used by the app.
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+3. **Seed data only (keeps existing data):**
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker-compose --profile tools run --rm seed
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+4. **Seed data (clears existing data first):**
+```bash
+docker-compose --profile tools run --rm -e CLEAR_DATA=true seed
+```
 
-## Resources
+5. **Run migrations and seed data together:**
+```bash
+docker-compose --profile tools run --rm migrate-and-seed
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+6. **Run migrations and seed data (clearing existing data):**
+```bash
+docker-compose --profile tools run --rm -e CLEAR_DATA=true migrate-and-seed
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Alternative: Run commands directly in container
 
-## Support
+**Run migrations:**
+```bash
+docker-compose exec back-end alembic upgrade head
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**Generate seed data:**
+```bash
+docker-compose exec back-end python scripts/generate_mock_data.py
+```
 
-## Stay in touch
+**Run both (using helper script):**
+```bash
+docker-compose exec back-end bash scripts/migrate_and_seed.sh
+docker-compose exec back-end bash scripts/migrate_and_seed.sh --clear
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Standalone Docker
+
+Build and run with Docker:
+
+```bash
+docker build -t team-tasks-api .
+docker run -p 3000:3000 team-tasks-api
+```
+
+## Project Structure
+
+```
+back-end/
+├── alembic/              # Database migrations
+├── app/
+│   ├── api/             # API routes
+│   │   └── v1/
+│   │       ├── endpoints/  # Route handlers
+│   │       └── api.py
+│   ├── core/            # Core configuration
+│   │   ├── config.py   # Settings
+│   │   ├── database.py # Database setup
+│   │   ├── security.py # JWT & password hashing
+│   │   └── dependencies.py # FastAPI dependencies
+│   ├── models/         # SQLAlchemy models
+│   ├── schemas/        # Pydantic schemas
+│   ├── services/       # Business logic
+│   └── realtime/       # WebSocket gateway
+├── main.py             # Application entry point
+├── requirements.txt    # Python dependencies
+└── alembic.ini         # Alembic configuration
+```
+
+## Validation
+
+All request/response validation is handled by Pydantic models in `app/schemas/`. The models automatically:
+- Validate data types
+- Enforce constraints (min/max length, email format, etc.)
+- Generate OpenAPI documentation
+- Provide clear error messages
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED

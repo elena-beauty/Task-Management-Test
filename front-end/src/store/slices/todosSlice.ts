@@ -47,7 +47,16 @@ export const createTodo = createAsyncThunk<Todo, CreateTodoPayload>(
   'todos/create',
   async (payload, { rejectWithValue }) => {
     try {
-      const { data } = await apiClient.post<Todo>('/todos', payload);
+      // Convert payload to snake_case for API
+      const apiPayload = {
+        title: payload.title,
+        description: payload.description,
+        due_date: payload.dueDate,
+        status: payload.status,
+        team_id: payload.teamId,
+        assignee_id: payload.assigneeId,
+      };
+      const { data } = await apiClient.post<Todo>('/todos', apiPayload);
       return data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message ?? 'Unable to create todo');
@@ -59,7 +68,15 @@ export const updateTodo = createAsyncThunk<Todo, UpdateTodoPayload>(
   'todos/update',
   async ({ id, updates }, { rejectWithValue }) => {
     try {
-      const { data } = await apiClient.patch<Todo>(`/todos/${id}`, updates);
+      // Convert payload to snake_case for API
+      const apiPayload: any = {};
+      if (updates.title !== undefined) apiPayload.title = updates.title;
+      if (updates.description !== undefined) apiPayload.description = updates.description;
+      if (updates.dueDate !== undefined) apiPayload.due_date = updates.dueDate;
+      if (updates.status !== undefined) apiPayload.status = updates.status;
+      if (updates.teamId !== undefined) apiPayload.team_id = updates.teamId;
+      if (updates.assigneeId !== undefined) apiPayload.assignee_id = updates.assigneeId;
+      const { data } = await apiClient.patch<Todo>(`/todos/${id}`, apiPayload);
       return data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message ?? 'Unable to update todo');

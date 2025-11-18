@@ -1,24 +1,38 @@
-# compiled output
-/dist
-/node_modules
-/build
-.npm-cache
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+*.egg
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Alembic
+alembic/versions/*.pyc
 
 # Logs
 logs
 *.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
 
 # OS
 .DS_Store
-
-# Tests
-/coverage
-/.nyc_output
+Thumbs.db
 
 # IDEs and editors
 /.idea
@@ -50,8 +64,8 @@ lerna-debug.log*
 # Runtime data
 pids
 *.pid
-*.seed
 *.pid.lock
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+# Test coverage
+/coverage
+.coverage.*

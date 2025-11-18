@@ -25,10 +25,16 @@ type Props = {
 const formatDueDate = (date?: string | null) => {
   if (!date) return 'No due date';
   try {
-    return format(parseISO(date), 'MMM d, yyyy');
+    return format(parseISO(date), 'dd-MM-yyyy');
   } catch {
     return 'No due date';
   }
+};
+
+const truncateDescription = (text: string | null | undefined, maxLength: number = 70) => {
+  if (!text) return 'No description';
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
 };
 
 export const TodoList = ({ todos, onEdit, onDelete }: Props) => (
@@ -51,11 +57,11 @@ export const TodoList = ({ todos, onEdit, onDelete }: Props) => (
                 secondary={
                   <>
                     <Typography variant="body2" color="text.secondary">
-                      {todo.description || 'No description'}
+                      {truncateDescription(todo.description)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Due: {formatDueDate(todo.dueDate)}
-                      {todo.assignee && ` · ${todo.assignee.name}`}
+                      Due: {formatDueDate((todo as any).due_date || todo.dueDate)}
+                      , Assignee: {todo.assignee && ` · ${todo.assignee.name}`}
                     </Typography>
                   </>
                 }

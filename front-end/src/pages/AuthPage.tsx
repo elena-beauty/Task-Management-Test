@@ -8,19 +8,27 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { loginUser, registerUser } from '../store/slices/authSlice';
 
 export default function AuthPage() {
   const dispatch = useAppDispatch();
-  const { status, error } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { status, error, token } = useAppSelector((state) => state.auth);
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
   });
+
+  useEffect(() => {
+    if (token && status === 'succeeded') {
+      navigate('/', { replace: true });
+    }
+  }, [token, status, navigate]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

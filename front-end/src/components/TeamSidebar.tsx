@@ -95,7 +95,7 @@ export const TeamSidebar = ({
           {members.map((member) => (
             <ListItem key={member.id} disablePadding>
               <ListItemText
-                primary={member.user.name}
+                primary={member.user_name ?? "User name"}
                 secondary={member.role}
               />
             </ListItem>

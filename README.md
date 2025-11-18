@@ -1,10 +1,10 @@
 # Team Task Platform
 
-Full‑stack application for managing team tasks, built with a NestJS REST API, React + Vite front‑end, PostgreSQL (via TypeORM), realtime collaboration over Socket.IO, and a small AI helper for suggestions.
+Full‑stack application for managing team tasks, built with a FastAPI,  REST API, React + Vite front‑end, PostgreSQL (via TypeORM), realtime collaboration over Socket.IO, and a small AI helper for suggestions.
 
 ## Project structure
 
-- `back-end`: NestJS API (authentication, teams, todos, AI helper, realtime gateway)
+- `back-end`: Fast API (authentication, teams, todos, AI helper, realtime gateway)
 - `front-end`: React + Vite SPA client
 - `docker-compose.yml`: Orchestrates Postgres, API, and Web containers
 
@@ -36,14 +36,14 @@ docker compose up --build
 
 On first run:
 
-- The **API container** installs dependencies, runs TypeORM **migrations**, then starts on `http://localhost:3000`.
-- The **seed script** runs automatically (via container entrypoint) to create demo data, including a default user `owner@example.com` / `Passw0rd!` (if not already present).
+- The **API container** installs dependencies, runs TypeORM **migrations**, then starts on `http://localhost:5001`.
+- The **seed script** runs automatically (via container entrypoint) to create demo data, including a default user `owner@example.com` / `password123` (if not already present).
 - The **front-end container** builds the React app and serves it via Nginx on `http://localhost:5173`.
 
 Once all containers are healthy, open the app in your browser:
 
 - **Web UI**: `http://localhost:5173`
-- **API** (for manual testing): `http://localhost:3000`
+- **API** (for manual testing): `http://localhost:5001`
 
 To stop and clean up containers and volumes:
 
@@ -56,8 +56,8 @@ docker compose down -v
 
 | Location   | Script                   | Description                         |
 |-----------|--------------------------|-------------------------------------|
-| `back-end`  | `docker-compose exec back-end npm run migration:run` | Applies TypeORM migrations via ts-node |
-| `back-end-test`  | `docker compose exec back-end npm run test:e2e`         | Run test Jest             |
+| `back-end`  | `docker-compose exec back-end alembic upgrade head or docker-compose exec back-end bash scripts/migrate_and_seed.sh` | Applies ORM migrations via alembic |
+| `back-end-test`  | `docker-compose --profile tools run --rm test`         | Run test Pytest             |
 | `front-end` | `npm run dev`          | Starts the Vite dev server          |
 | root        | `docker compose up --build` | Boots Postgres + API + Web stack |
 

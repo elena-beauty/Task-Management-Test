@@ -36,7 +36,7 @@ export type Todo = {
 };
 
 export type AuthResponse = {
-  accessToken: string;
+  access_token: string;
   user: AuthUser;
 };
 
@@ -46,5 +46,17 @@ export type AiSuggestion = {
   recommendedStatus: TodoStatus;
   confidence: number;
   reasoning: string;
+};
+
+export type AiChatMessage = {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+};
+
+export type AiChatResponse = {
+  summary: string;
+  error?: string | null;
 };
 
