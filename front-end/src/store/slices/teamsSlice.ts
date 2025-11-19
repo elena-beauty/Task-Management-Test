@@ -10,6 +10,7 @@ type CreateTeamPayload = {
 
 type AddMemberPayload = {
   teamId: string;
+  name: string;
   email: string;
   role?: 'owner' | 'member';
 };
@@ -64,6 +65,7 @@ export const addTeamMember = createAsyncThunk<
     const { data } = await apiClient.post<TeamMember>(
       `/teams/${payload.teamId}/members`,
       {
+        name: payload.name,
         email: payload.email,
         role: payload.role,
       },

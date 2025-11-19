@@ -53,9 +53,7 @@ export const TodoFormDialog = ({
 
   useEffect(() => {
     if (initialTodo) {
-      // Handle both camelCase (dueDate) and snake_case (due_date) from API
       const dueDateValue = (initialTodo as any).due_date || initialTodo.dueDate;
-      // Handle both camelCase (assignee) and snake_case (assignee_id) from API
       const assigneeIdValue = 
         initialTodo.assignee?.id || 
         (initialTodo as any).assignee_id || 

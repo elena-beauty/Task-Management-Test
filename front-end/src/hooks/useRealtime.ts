@@ -2,14 +2,13 @@ import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAppDispatch, useAppSelector } from '.';
 import { todoDeleted, todoUpserted } from '../store/slices/todosSlice';
-import { notificationReceived } from '../store/slices/notificationsSlice';
+import { notificationReceived, type Notification } from '../store/slices/notificationsSlice';
 import type { Todo } from '../types';
 
 const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:5001/api';
 const fallbackWs = apiUrl.replace(/\/api$/, '');
 const wsUrl = import.meta.env.VITE_WS_URL ?? fallbackWs;
 
-// Transform snake_case backend data to camelCase frontend format
 const transformTodo = (data: any): Todo => {
   return {
     id: data.id,
@@ -93,17 +92,14 @@ export const useRealtime = (teamId?: string) => {
         type: error.type,
         description: error.description,
       });
-      // Try to reconnect with polling only if websocket fails
       if (error.type === 'TransportError' || error.message?.includes('websocket')) {
         console.log('Transport error detected, will retry with polling fallback...');
-        // The socket will automatically retry with available transports
       }
     });
     
     socket.on('disconnect', (reason) => {
       console.log('WebSocket disconnected:', reason);
       if (reason === 'io server disconnect') {
-        // Server disconnected, try to reconnect
         socket.connect();
       }
     });
@@ -114,7 +110,6 @@ export const useRealtime = (teamId?: string) => {
     
     socket.on('upgradeError', (error) => {
       console.warn('Transport upgrade error:', error);
-      // Continue with polling if upgrade fails
     });
     
     socketRef.current = socket;
@@ -140,8 +135,15 @@ export const useRealtime = (teamId?: string) => {
       console.log('✅ Successfully joined team room:', data);
     });
     
-    socket.on('notification.created', (notification) => {
-      dispatch(notificationReceived(notification));
+    socket.on('notification.created', (notification: any) => {
+      const transformed: Notification = {
+        id: notification.id,
+        type: notification.type,
+        message: notification.message,
+        read: notification.read,
+        createdAt: notification.created_at || notification.createdAt,
+      };
+      dispatch(notificationReceived(transformed));
     });
     
     return () => {
@@ -167,7 +169,6 @@ export const useRealtime = (teamId?: string) => {
     if (socketRef.current?.connected) {
       joinTeam();
     } else if (socketRef.current) {
-      // If socket exists but not connected yet, wait for connection
       socketRef.current.once('connect', () => {
         console.log('Socket connected, joining team:', teamId);
         joinTeam();

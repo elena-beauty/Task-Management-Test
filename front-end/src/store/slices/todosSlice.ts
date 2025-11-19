@@ -47,7 +47,6 @@ export const createTodo = createAsyncThunk<Todo, CreateTodoPayload>(
   'todos/create',
   async (payload, { rejectWithValue }) => {
     try {
-      // Convert payload to snake_case for API
       const apiPayload = {
         title: payload.title,
         description: payload.description,
@@ -68,7 +67,6 @@ export const updateTodo = createAsyncThunk<Todo, UpdateTodoPayload>(
   'todos/update',
   async ({ id, updates }, { rejectWithValue }) => {
     try {
-      // Convert payload to snake_case for API
       const apiPayload: any = {};
       if (updates.title !== undefined) apiPayload.title = updates.title;
       if (updates.description !== undefined) apiPayload.description = updates.description;

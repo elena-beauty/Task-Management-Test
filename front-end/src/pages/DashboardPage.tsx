@@ -104,7 +104,7 @@ const DashboardPage = () => {
     dispatch(deleteTodo(id));
   };
 
-  const handleAddMember = (values: { email: string; role?: 'owner' | 'member' }) => {
+  const handleAddMember = (values: { name: string; email: string; role?: 'owner' | 'member' }) => {
     if (!selectedTeamId) return;
     dispatch(addTeamMember({ teamId: selectedTeamId, ...values }));
     setMemberDialogOpen(false);

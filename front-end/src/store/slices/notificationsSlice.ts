@@ -22,12 +22,22 @@ const initialState: NotificationsState = {
   error: null,
 };
 
+const transformNotification = (data: any): Notification => {
+  return {
+    id: data.id,
+    type: data.type,
+    message: data.message,
+    read: data.read,
+    createdAt: data.created_at || data.createdAt,
+  };
+};
+
 export const fetchNotifications = createAsyncThunk<Notification[]>(
   'notifications/fetch',
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await apiClient.get<Notification[]>('/notifications');
-      return data;
+      const { data } = await apiClient.get<any[]>('/notifications');
+      return data.map(transformNotification);
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ?? 'Failed to load notifications',

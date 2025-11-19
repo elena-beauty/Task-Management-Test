@@ -104,7 +104,7 @@ class TeamService:
                 UserCreate(
                     name=dto.name or dto.email,
                     email=dto.email,
-                    password="Passw0rd!",
+                    password="password123",
                 ),
             )
 

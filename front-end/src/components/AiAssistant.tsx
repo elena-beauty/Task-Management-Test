@@ -47,7 +47,6 @@ export const AiAssistant = ({ teamContext }: Props) => {
     }
   };
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);

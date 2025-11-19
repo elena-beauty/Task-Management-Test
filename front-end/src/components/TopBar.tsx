@@ -31,7 +31,7 @@ export const TopBar = () => {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
     }
-    return a.read ? 1 : -1; // unread first
+    return a.read ? 1 : -1;
   });
 
   const handleLogout = () => {
