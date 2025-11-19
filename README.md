@@ -15,6 +15,10 @@ Docker Compose is the recommended way to run the entire application stack.
    ```bash
    docker compose up --build
    ```
+   ```bash
+   docker compose exec back-end python scripts/generate_mock_data.py
+   ```
+
 
 3. **Access the application**:
    - **Web UI**: http://localhost:5173
@@ -22,8 +26,10 @@ Docker Compose is the recommended way to run the entire application stack.
    - **API ReDoc**: http://localhost:5001/redoc
    - **PostgreSQL**: localhost:5435 (user: `postgres`, password: `postgres`, database: `team_tasks`)
 
-
-
+**Run pytest in BackEnd**:
+```bash
+docker-compose --profile tools run --rm test
+```
 
 **Stop services**:
 ```bash
@@ -33,11 +39,6 @@ docker compose stop
 **Stop and remove containers** (keeps volumes):
 ```bash
 docker compose down
-```
-
-**Stop and remove containers and volumes** (⚠️ **deletes database data**):
-```bash
-docker compose down -v
 ```
 
 ### Video demo
