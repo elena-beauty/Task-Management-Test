@@ -15,9 +15,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_HOURS: int = 24
     
-    # OpenAI
-    OPENAI_API_KEY: Optional[str] = None
-    OPENAI_MODEL: str = "gpt-4o-mini"
+    # Google AI Studio (Gemini)
+    GOOGLE_AI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "models/gemini-2.0-flash"
     
     # Server
     PORT: int = 5000
