@@ -35,73 +35,71 @@ from app.models.notification import Notification, NotificationType
 fake = Faker()
 
 
-def generate_users(db: SessionLocal, count: int = 20) -> list[User]:
-    """Generate mock users"""
-    print(f"Generating {count} users...")
+def generate_users(db: SessionLocal) -> list[User]:
+    """Generate mock users - creates exactly 2 users"""
+    print("Generating 2 users...")
     users = []
     
-    for i in range(count):
-        user = User(
-            email=fake.unique.email(),
-            name=fake.name(),
-            password_hash=get_password_hash("password123"),  # Default password for all mock users
-        )
-        db.add(user)
-        users.append(user)
+    owner_user = User(
+        email="owner@gmail.com",
+        name="Team Owner",
+        password_hash=get_password_hash("password123"),
+    )
+    db.add(owner_user)
+    users.append(owner_user)
+    
+    developer_user = User(
+        email="developer@gmail.com",
+        name="Developer",
+        password_hash=get_password_hash("password123"),
+    )
+    db.add(developer_user)
+    users.append(developer_user)
     
     db.commit()
     print(f"✓ Created {len(users)} users")
     return users
 
 
-def generate_teams(db: SessionLocal, users: list[User], count: int = 10) -> list[Team]:
-    """Generate mock teams"""
-    print(f"Generating {count} teams...")
+def generate_teams(db: SessionLocal, owner_user: User) -> list[Team]:
+    """Generate mock teams - creates 1 team with the owner user"""
+    print("Generating 1 team...")
     teams = []
     
-    for i in range(count):
-        owner = choice(users)
-        team = Team(
-            name=fake.company(),
-            description=fake.text(max_nb_chars=200),
-            owner_id=owner.id,
-        )
-        db.add(team)
-        teams.append(team)
+    team = Team(
+        name="Development Team",
+        description="Main development team",
+        owner_id=owner_user.id,
+    )
+    db.add(team)
+    teams.append(team)
     
     db.commit()
     print(f"✓ Created {len(teams)} teams")
     return teams
 
 
-def generate_team_memberships(db: SessionLocal, teams: list[Team], users: list[User]):
-    """Generate mock team memberships"""
+def generate_team_memberships(db: SessionLocal, teams: list[Team], owner_user: User, developer_user: User):
+    """Generate mock team memberships - adds owner and developer to the team"""
     print("Generating team memberships...")
     memberships = []
     
     for team in teams:
-        # Add owner as member
         owner_membership = TeamMembership(
             team_id=team.id,
-            user_id=team.owner_id,
+            user_id=owner_user.id,
             role=TeamRole.OWNER,
         )
         db.add(owner_membership)
         memberships.append(owner_membership)
         
-        # Add 2-5 random members to each team
-        other_users = [u for u in users if u.id != team.owner_id]
-        num_members = randint(2, min(5, len(other_users)))
-        selected_members = sample(other_users, num_members)
-        
-        for member in selected_members:
-            membership = TeamMembership(
-                team_id=team.id,
-                user_id=member.id,
-                role=TeamRole.MEMBER,
-            )
-            db.add(membership)
-            memberships.append(membership)
+        developer_membership = TeamMembership(
+            team_id=team.id,
+            user_id=developer_user.id,
+            role=TeamRole.MEMBER,
+        )
+        db.add(developer_membership)
+        memberships.append(developer_membership)
     
     db.commit()
     print(f"✓ Created {len(memberships)} team memberships")
@@ -118,7 +116,6 @@ def generate_todos(db: SessionLocal, teams: list[Team], users: list[User], count
         team = choice(teams)
         assignee = choice(users) if randint(0, 1) else None
         
-        # Random due date (some in past, some in future)
         days_offset = randint(-30, 30)
         due_date = datetime.now() + timedelta(days=days_offset) if randint(0, 1) else None
         
@@ -153,7 +150,6 @@ def generate_notifications(db: SessionLocal, users: list[User], teams: list[Team
         team = choice(teams) if randint(0, 1) else None
         notification_type = choice(notification_types)
         
-        # Create appropriate message based on type
         if notification_type == NotificationType.TODO_CREATED:
             message = f"New todo '{choice(todos).title if todos else 'Task'}' was created"
         elif notification_type == NotificationType.TODO_UPDATED:
@@ -193,16 +189,16 @@ def main():
     db = SessionLocal()
     
     try:
-        # Ask if user wants to clear existing data
         clear_data = os.getenv("CLEAR_DATA", "false").lower() == "true"
         
         if clear_data:
             clear_all_data(db)
         
-        # Generate data
-        users = generate_users(db, count=20)
-        teams = generate_teams(db, users, count=10)
-        memberships = generate_team_memberships(db, teams, users)
+        users = generate_users(db)
+        owner_user = next(u for u in users if u.email == "owner@gmail.com")
+        developer_user = next(u for u in users if u.email == "developer@gmail.com")
+        teams = generate_teams(db, owner_user)
+        memberships = generate_team_memberships(db, teams, owner_user, developer_user)
         todos = generate_todos(db, teams, users, count=50)
         notifications = generate_notifications(db, users, teams, todos, count=30)
         

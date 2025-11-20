@@ -10,11 +10,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import type { Team, TeamMember } from '../types';
+import type { Team, TeamMember, TeamRole } from '../types';
 
 type Props = {
   teams: Team[];
   selectedTeamId?: string;
+  selectedTeamRole?: TeamRole;
   onSelect: (teamId: string) => void;
   onCreateTeam: () => void;
   onAddMember: () => void;
@@ -25,40 +26,48 @@ type Props = {
 export const TeamSidebar = ({
   teams,
   selectedTeamId,
+  selectedTeamRole,
   onSelect,
   onCreateTeam,
   onAddMember,
   members,
   isLoadingMembers,
-}: Props) => (
-  <Box
-    sx={{
-      width: 280,
-      backgroundColor: 'background.paper',
-      borderRight: '1px solid',
-      borderColor: 'divider',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-    }}
-  >
-    <Box px={2} py={3}>
-      <Typography variant="h6">Teams</Typography>
-      <Stack direction="column" spacing={1} mt={2}>
-        <Button variant="contained" onClick={onCreateTeam} fullWidth>
-          New Team
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={onAddMember}
-          fullWidth
-          disabled={!selectedTeamId}
-        >
-          Invite Member
-        </Button>
-      </Stack>
-    </Box>
+}: Props) => {
+  const isOwner = selectedTeamRole === 'owner';
+  
+  return (
+    <Box
+      sx={{
+        width: 280,
+        backgroundColor: 'background.paper',
+        borderRight: '1px solid',
+        borderColor: 'divider',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Box px={2} py={3}>
+        <Typography variant="h6">Teams</Typography>
+        <Stack direction="column" spacing={1} mt={2}>
+          {isOwner && (
+            <Button variant="contained" onClick={onCreateTeam} fullWidth>
+              New Team
+            </Button>
+          )}
+          {isOwner && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={onAddMember}
+              fullWidth
+              disabled={!selectedTeamId}
+            >
+              Invite Member
+            </Button>
+          )}
+        </Stack>
+      </Box>
     <Divider />
     <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
       <List>
@@ -109,5 +118,6 @@ export const TeamSidebar = ({
       )}
     </Box>
   </Box>
-);
+  );
+};
 

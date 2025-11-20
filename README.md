@@ -1,6 +1,6 @@
 # Team Task Platform
 
-Full‑stack application for managing team tasks, built with a FastAPI REST API, React + Vite front‑end, PostgreSQL (via SQLAlchemy), realtime collaboration over Socket.IO, and a small AI helper for suggestions.
+Full‑stack application for managing team tasks, built with a FastAPI REST API, React + Vite front‑end, PostgreSQL (via SQLAlchemy), realtime collaboration over Socket.IO for notification and update task, and a small AI helper for suggestions.
 
 ## Setup with Docker Compose
 
@@ -30,6 +30,21 @@ Docker Compose is the recommended way to run the entire application stack.
 ```bash
 docker-compose --profile tools run --rm test
 ```
+
+**Demo with Seed data**:
+Go to: http://localhost:5173
+
+1, Owner team: 
+
+email: owner@gmail.com, password: password123
+
+permision: CURD task, CURD team, invite new member, chat with AI agent
+
+2, Member:
+
+email: developer@gmail.com, password: password123
+
+permision: CURD task, chat with AI agent
 
 **Stop services**:
 ```bash

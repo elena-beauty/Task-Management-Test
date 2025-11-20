@@ -122,6 +122,7 @@ const DashboardPage = () => {
         <TeamSidebar
           teams={teams}
           selectedTeamId={selectedTeamId}
+          selectedTeamRole={selectedTeam?.role}
           onSelect={(teamId) => dispatch(selectTeam(teamId))}
           onCreateTeam={() => setTeamDialogOpen(true)}
           onAddMember={() => setMemberDialogOpen(true)}
@@ -140,13 +141,15 @@ const DashboardPage = () => {
               </Typography>
             </Box>
             <Stack direction="row" spacing={2}>
-              <Button
-                variant="outlined"
-                onClick={() => setMemberDialogOpen(true)}
-                disabled={!selectedTeamId}
-              >
-                Invite member
-              </Button>
+              {selectedTeam?.role === 'owner' && (
+                <Button
+                  variant="outlined"
+                  onClick={() => setMemberDialogOpen(true)}
+                  disabled={!selectedTeamId}
+                >
+                  Invite member
+                </Button>
+              )}
               <Button
                 variant="contained"
                 onClick={openNewTodoDialog}
